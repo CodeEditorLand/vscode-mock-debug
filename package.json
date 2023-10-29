@@ -1,11 +1,13 @@
 {
   "name": "mock-debug",
   "displayName": "Mock Debug",
-  "version": "0.52.0",
+  "version": "0.0.1",
   "publisher": "ms-vscode",
   "description": "Starter extension for developing debug adapters for VS Code.",
   "author": {
-    "name": "Microsoft Corporation"
+    "name": "Nikola Hristov",
+    "email": "nikola@nikolahristov.tech",
+    "url": "https://nikolahristov.tech"
   },
   "license": "MIT",
   "keywords": [
@@ -18,13 +20,13 @@
   "categories": [
     "Debuggers"
   ],
-  "private": true,
+  "private": "false",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Microsoft/vscode-mock-debug.git"
+    "url": "git+https://github.com/CodeEditorLand/CodeEditorLand.git"
   },
   "bugs": {
-    "url": "https://github.com/Microsoft/vscode-mock-debug/issues"
+    "url": "https://github.com/CodeEditorLand/CodeEditorLand/issues"
   },
   "scripts": {
     "compile": "tsc -p ./",
@@ -39,7 +41,8 @@
     "publish": "vsce publish",
     "publish-pre-release": "vsce publish --pre-release",
     "vscode:prepublish": "rimraf dist && npm run -S esbuild-base -- --minify && npm run -S esbuild-web -- --minify",
-    "test": "npm run typecheck"
+    "test": "npm run typecheck",
+    "prepublishOnly": "TypeScriptESBuild Source/**/*.ts"
   },
   "devDependencies": {
     "@types/glob": "8.1.0",
@@ -61,7 +64,8 @@
     "rimraf": "5.0.5",
     "typescript": "5.2.2",
     "url": "0.11.3",
-    "vsce": "2.7.0"
+    "vsce": "2.7.0",
+    "typescript-esbuild": "0.3.1"
   },
   "main": "./dist/extension.js",
   "browser": "./dist/web-extension.js",
@@ -239,5 +243,10 @@
         }
       }
     ]
+  },
+  "homepage": "https://github.com/CodeEditorLand/CodeEditorLand#readme",
+  "type": "module",
+  "publishConfig": {
+    "access": "public"
   }
 }
