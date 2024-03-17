@@ -1,15 +1,35 @@
 {
-  "activationEvents": [
-    "onDebugResolve:mock",
-    "onDebugDynamicConfigurations:mock",
-    "onCommand:extension.mock-debug.getProgramName"
-  ],
+  "name": "mock-debug",
+  "displayName": "Mock Debug",
+  "version": "0.52.0",
+  "private": true,
+  "description": "Starter extension for developing debug adapters for VS Code.",
+  "bugs": {
+    "url": "https://github.com/Microsoft/vscode-mock-debug/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Microsoft/vscode-mock-debug.git"
+  },
+  "license": "MIT",
   "author": {
     "name": "Microsoft Corporation"
   },
+  "publisher": "ms-vscode",
+  "main": "./dist/extension.js",
   "browser": "./dist/web-extension.js",
-  "bugs": {
-    "url": "https://github.com/Microsoft/vscode-mock-debug/issues"
+  "scripts": {
+    "build": "npm run -S esbuild-base -- --sourcemap --sources-content=false && npm run -S esbuild-web -- --sourcemap --sources-content=false",
+    "compile": "tsc -p ./",
+    "esbuild-base": "esbuild ./src/extension.ts --bundle --tsconfig=./tsconfig.json --external:vscode --format=cjs --platform=node --outfile=dist/extension.js",
+    "esbuild-web": "esbuild ./src/web-extension.ts --bundle --tsconfig=./tsconfig.json --external:vscode --format=cjs --platform=browser --outfile=dist/web-extension.js",
+    "package": "vsce package",
+    "publish": "vsce publish",
+    "publish-pre-release": "vsce publish --pre-release",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "vscode:prepublish": "rimraf dist && npm run -S esbuild-base -- --minify && npm run -S esbuild-web -- --minify",
+    "watch": "npm run -S esbuild-base -- --sourcemap --sources-content=false --watch",
+    "watch-web": "npm run -S esbuild-web -- --sourcemap --sources-content=false --watch"
   },
   "contributes": {
     "breakpoints": [
@@ -178,7 +198,11 @@
       ]
     }
   },
-  "description": "Starter extension for developing debug adapters for VS Code.",
+  "activationEvents": [
+    "onDebugResolve:mock",
+    "onDebugDynamicConfigurations:mock",
+    "onCommand:extension.mock-debug.getProgramName"
+  ],
   "devDependencies": {
     "@types/glob": "7.2.0",
     "@types/mocha": "9.1.0",
@@ -198,31 +222,7 @@
     "url": "0.11.0",
     "vsce": "2.7.0"
   },
-  "displayName": "Mock Debug",
   "icon": "images/mock-debug-icon.png",
-  "license": "MIT",
-  "main": "./dist/extension.js",
-  "name": "mock-debug",
-  "private": true,
-  "publisher": "ms-vscode",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Microsoft/vscode-mock-debug.git"
-  },
-  "scripts": {
-    "build": "npm run -S esbuild-base -- --sourcemap --sources-content=false && npm run -S esbuild-web -- --sourcemap --sources-content=false",
-    "compile": "tsc -p ./",
-    "esbuild-base": "esbuild ./src/extension.ts --bundle --tsconfig=./tsconfig.json --external:vscode --format=cjs --platform=node --outfile=dist/extension.js",
-    "esbuild-web": "esbuild ./src/web-extension.ts --bundle --tsconfig=./tsconfig.json --external:vscode --format=cjs --platform=browser --outfile=dist/web-extension.js",
-    "package": "vsce package",
-    "publish": "vsce publish",
-    "publish-pre-release": "vsce publish --pre-release",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
-    "vscode:prepublish": "rimraf dist && npm run -S esbuild-base -- --minify && npm run -S esbuild-web -- --minify",
-    "watch": "npm run -S esbuild-base -- --sourcemap --sources-content=false --watch",
-    "watch-web": "npm run -S esbuild-web -- --sourcemap --sources-content=false --watch"
-  },
-  "version": "0.52.0",
   "workspaceTrust": {
     "request": "never"
   }
