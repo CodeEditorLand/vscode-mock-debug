@@ -44,10 +44,10 @@
   "devDependencies": {
     "@types/glob": "8.1.0",
     "@types/mocha": "10.0.6",
-    "@types/node": "20.11.28",
+    "@types/node": "20.11.30",
     "@types/vscode": "1.87.0",
-    "@typescript-eslint/eslint-plugin": "7.2.0",
-    "@typescript-eslint/parser": "7.2.0",
+    "@typescript-eslint/eslint-plugin": "7.3.1",
+    "@typescript-eslint/parser": "7.3.1",
     "@vscode/debugadapter": "1.65.0",
     "@vscode/debugadapter-testsupport": "1.65.0",
     "await-notify": "1.0.1",
