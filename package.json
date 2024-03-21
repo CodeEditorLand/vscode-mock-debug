@@ -222,7 +222,7 @@
 		"path-browserify": "1.0.1",
 		"rimraf": "5.0.5",
 		"typescript": "5.4.2",
-		"typescript-esbuild": "latest",
+		"typescript-esbuild": "0.4.5",
 		"url": "0.11.3",
 		"vsce": "2.7.0"
 	},
