@@ -1,39 +1,10 @@
 {
-	"name": "mock-debug",
-	"displayName": "Mock Debug",
-	"version": "0.0.1",
-	"private": false,
-	"description": "Starter extension for developing debug adapters for VS Code.",
-	"homepage": "https://github.com/CodeEditorLand/Foundation#readme",
-	"bugs": {
-		"url": "https://github.com/CodeEditorLand/Foundation/issues"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/CodeEditorLand/Foundation.git"
-	},
-	"license": "SEE LICENSE IN LICENSE",
-	"author": {
-		"name": "Playform",
-		"email": "Hello@Playform.Cloud",
-		"url": "https://playform.cloud"
-	},
-	"type": "module",
-	"main": "./dist/extension.js",
+	"activationEvents": [
+		"onDebugResolve:mock",
+		"onDebugDynamicConfigurations:mock",
+		"onCommand:extension.mock-debug.getProgramName"
+	],
 	"browser": "./dist/web-extension.js",
-	"scripts": {
-		"build": "npm run -S esbuild-base -- --sourcemap --sources-content=false && npm run -S esbuild-web -- --sourcemap --sources-content=false",
-		"compile": "tsc -p ./",
-		"esbuild-base": "esbuild ./src/extension.ts --bundle --tsconfig=./tsconfig.json --external:vscode --format=cjs --platform=node --outfile=dist/extension.js",
-		"esbuild-web": "esbuild ./src/web-extension.ts --bundle --tsconfig=./tsconfig.json --external:vscode --format=cjs --platform=browser --outfile=dist/web-extension.js",
-		"package": "vsce package",
-		"prepublishOnly": "TypeScriptESBuild 'Source/**/*.ts'",
-		"publish": "vsce publish",
-		"publish-pre-release": "vsce publish --pre-release",
-		"vscode:prepublish": "rimraf dist && npm run -S esbuild-base -- --minify && npm run -S esbuild-web -- --minify",
-		"watch": "npm run -S esbuild-base -- --sourcemap --sources-content=false --watch",
-		"watch-web": "npm run -S esbuild-web -- --sourcemap --sources-content=false --watch"
-	},
 	"contributes": {
 		"breakpoints": [
 			{
@@ -201,11 +172,7 @@
 			]
 		}
 	},
-	"activationEvents": [
-		"onDebugResolve:mock",
-		"onDebugDynamicConfigurations:mock",
-		"onCommand:extension.mock-debug.getProgramName"
-	],
+	"description": "Starter extension for developing debug adapters for VS Code.",
 	"devDependencies": {
 		"@types/glob": "8.1.0",
 		"@types/mocha": "10.0.6",
@@ -226,10 +193,24 @@
 		"url": "0.11.3",
 		"vsce": "2.7.0"
 	},
-	"publishConfig": {
-		"access": "public"
-	},
+	"displayName": "Mock Debug",
 	"icon": "images/mock-debug-icon.png",
+	"main": "./dist/extension.js",
+	"name": "mock-debug",
+	"scripts": {
+		"build": "npm run -S esbuild-base -- --sourcemap --sources-content=false && npm run -S esbuild-web -- --sourcemap --sources-content=false",
+		"compile": "tsc -p ./",
+		"esbuild-base": "esbuild ./src/extension.ts --bundle --tsconfig=./tsconfig.json --external:vscode --format=cjs --platform=node --outfile=dist/extension.js",
+		"esbuild-web": "esbuild ./src/web-extension.ts --bundle --tsconfig=./tsconfig.json --external:vscode --format=cjs --platform=browser --outfile=dist/web-extension.js",
+		"package": "vsce package",
+		"prepublishOnly": "TypeScriptESBuild 'Source/**/*.ts'",
+		"publish": "vsce publish",
+		"publish-pre-release": "vsce publish --pre-release",
+		"vscode:prepublish": "rimraf dist && npm run -S esbuild-base -- --minify && npm run -S esbuild-web -- --minify",
+		"watch": "npm run -S esbuild-base -- --sourcemap --sources-content=false --watch",
+		"watch-web": "npm run -S esbuild-web -- --sourcemap --sources-content=false --watch"
+	},
+	"type": "module",
 	"workspaceTrust": {
 		"request": "never"
 	}
