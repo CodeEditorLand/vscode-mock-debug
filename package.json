@@ -1,39 +1,17 @@
 {
-	"name": "mock-debug",
-	"displayName": "Mock Debug",
-	"version": "0.0.1",
-	"private": false,
-	"description": "Starter extension for developing debug adapters for VS Code.",
-	"keywords": [
-		"land"
+	"activationEvents": [
+		"onDebugResolve:mock",
+		"onDebugDynamicConfigurations:mock",
+		"onCommand:extension.mock-debug.getProgramName"
 	],
-	"homepage": "HTTPS://GitHub.Com/CodeEditorLand/LandMockDebug#readme",
-	"bugs": {
-		"url": "HTTPS://GitHub.Com/CodeEditorLand/LandMockDebug/issues"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+HTTPS://github.com/CodeEditorLand/LandMockDebug.git"
-	},
-	"license": "SEE LICENSE IN LICENSE",
 	"author": {
-		"name": "🌆 — Land —",
 		"email": "Land@PlayForm.Cloud",
+		"name": "🌆 — Land —",
 		"url": "HTTPS://Land.PlayForm.Cloud"
 	},
-	"type": "module",
-	"main": "./dist/extension.js",
 	"browser": "./dist/web-extension.js",
-	"scripts": {
-		"Document": "Document 'Source/**/*.ts'",
-		"build": "npm run -S esbuild-base -- --sourcemap --sources-content=false && npm run -S esbuild-web -- --sourcemap --sources-content=false",
-		"compile": "tsc -p ./",
-		"esbuild-base": "esbuild ./src/extension.ts --bundle --tsconfig=./tsconfig.json --external:vscode --format=cjs --platform=node --outfile=dist/extension.js",
-		"esbuild-web": "esbuild ./src/web-extension.ts --bundle --tsconfig=./tsconfig.json --external:vscode --format=cjs --platform=browser --outfile=dist/web-extension.js",
-		"prepublishOnly": "Build 'Source/**/*.ts'",
-		"publish": "vsce publish",
-		"publish-pre-release": "vsce publish --pre-release",
-		"watch-web": "npm run -S esbuild-web -- --sourcemap --sources-content=false --watch"
+	"bugs": {
+		"url": "HTTPS://GitHub.Com/CodeEditorLand/LandMockDebug/issues"
 	},
 	"contributes": {
 		"breakpoints": [
@@ -202,11 +180,7 @@
 			]
 		}
 	},
-	"activationEvents": [
-		"onDebugResolve:mock",
-		"onDebugDynamicConfigurations:mock",
-		"onCommand:extension.mock-debug.getProgramName"
-	],
+	"description": "Starter extension for developing debug adapters for VS Code.",
 	"devDependencies": {
 		"@playform/build": "0.0.7",
 		"@playform/document": "0.0.6",
@@ -221,10 +195,36 @@
 		"rimraf": "5.0.5",
 		"url": "0.11.3"
 	},
+	"displayName": "Mock Debug",
+	"homepage": "HTTPS://GitHub.Com/CodeEditorLand/LandMockDebug#readme",
+	"icon": "images/mock-debug-icon.png",
+	"keywords": [
+		"land"
+	],
+	"license": "SEE LICENSE IN LICENSE",
+	"main": "./dist/extension.js",
+	"name": "mock-debug",
+	"private": false,
 	"publishConfig": {
 		"access": "public"
 	},
-	"icon": "images/mock-debug-icon.png",
+	"repository": {
+		"type": "git",
+		"url": "git+HTTPS://github.com/CodeEditorLand/LandMockDebug.git"
+	},
+	"scripts": {
+		"Document": "Document 'Source/**/*.ts'",
+		"build": "npm run -S esbuild-base -- --sourcemap --sources-content=false && npm run -S esbuild-web -- --sourcemap --sources-content=false",
+		"compile": "tsc -p ./",
+		"esbuild-base": "esbuild ./src/extension.ts --bundle --tsconfig=./tsconfig.json --external:vscode --format=cjs --platform=node --outfile=dist/extension.js",
+		"esbuild-web": "esbuild ./src/web-extension.ts --bundle --tsconfig=./tsconfig.json --external:vscode --format=cjs --platform=browser --outfile=dist/web-extension.js",
+		"prepublishOnly": "Build 'Source/**/*.ts'",
+		"publish": "vsce publish",
+		"publish-pre-release": "vsce publish --pre-release",
+		"watch-web": "npm run -S esbuild-web -- --sourcemap --sources-content=false --watch"
+	},
+	"type": "module",
+	"version": "0.0.1",
 	"workspaceTrust": {
 		"request": "never"
 	}
