@@ -210,16 +210,16 @@
 	"devDependencies": {
 		"@playform/build": "0.0.7",
 		"@playform/document": "0.0.6",
-		"@types/glob": "^7.2.0",
-		"@types/node": "^14.14.37",
-		"await-notify": "^1.0.1",
-		"base64-js": "^1.5.1",
-		"esbuild": "^0.14.29",
-		"events": "^3.3.0",
-		"glob": "^7.2.0",
-		"path-browserify": "^1.0.1",
-		"rimraf": "^3.0.2",
-		"url": "^0.11.0"
+		"@types/glob": "8.1.0",
+		"@types/node": "20.12.7",
+		"await-notify": "1.0.1",
+		"base64-js": "1.5.1",
+		"esbuild": "0.20.2",
+		"events": "3.3.0",
+		"glob": "10.3.12",
+		"path-browserify": "1.0.1",
+		"rimraf": "5.0.5",
+		"url": "0.11.3"
 	},
 	"publishConfig": {
 		"access": "public"
