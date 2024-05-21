@@ -186,16 +186,16 @@
 		"onCommand:extension.mock-debug.getProgramName"
 	],
 	"devDependencies": {
-		"@types/glob": "7.2.0",
-		"@types/node": "14.14.37",
+		"@types/glob": "8.1.0",
+		"@types/node": "20.12.12",
 		"await-notify": "1.0.1",
 		"base64-js": "1.5.1",
-		"esbuild": "0.14.29",
+		"esbuild": "0.21.3",
 		"events": "3.3.0",
-		"glob": "7.2.0",
+		"glob": "10.3.15",
 		"path-browserify": "1.0.1",
-		"rimraf": "3.0.2",
-		"url": "0.11.0"
+		"rimraf": "5.0.7",
+		"url": "0.11.3"
 	},
 	"icon": "images/mock-debug-icon.png",
 	"workspaceTrust": {
