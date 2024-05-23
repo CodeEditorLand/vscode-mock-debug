@@ -1,7 +1,5 @@
 out
 dist
 .vscode-test/
-npm-debug.log
 mock-debug.txt
 *.vsix
-.DS_Store
