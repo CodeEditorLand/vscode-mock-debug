@@ -190,7 +190,7 @@
 		"@types/node": "20.14.9",
 		"await-notify": "1.0.1",
 		"base64-js": "1.5.1",
-		"esbuild": "0.22.0",
+		"esbuild": "0.23.0",
 		"events": "3.3.0",
 		"glob": "10.4.2",
 		"path-browserify": "1.0.1",
