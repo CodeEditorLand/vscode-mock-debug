@@ -175,7 +175,7 @@
 	"description": "Starter extension for developing debug adapters for VS Code.",
 	"devDependencies": {
 		"@types/glob": "8.1.0",
-		"@types/node": "22.8.4",
+		"@types/node": "22.8.6",
 		"await-notify": "1.0.1",
 		"base64-js": "1.5.1",
 		"esbuild": "0.24.0",
