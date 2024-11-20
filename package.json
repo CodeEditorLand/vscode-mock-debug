@@ -1,10 +1,18 @@
 {
-	"activationEvents": [
-		"onDebugResolve:mock",
-		"onDebugDynamicConfigurations:mock",
-		"onCommand:extension.mock-debug.getProgramName"
-	],
+	"name": "mock-debug",
+	"displayName": "Mock Debug",
+	"description": "Starter extension for developing debug adapters for VS Code.",
+	"main": "./dist/extension.js",
 	"browser": "./dist/web-extension.js",
+	"scripts": {
+		"build": "npm run -S esbuild-base -- --sourcemap --sources-content=false && npm run -S esbuild-web -- --sourcemap --sources-content=false",
+		"compile": "tsc -p ./",
+		"esbuild-base": "esbuild ./src/extension.ts --bundle --tsconfig=./tsconfig.json --external:vscode --format=cjs --platform=node --outfile=dist/extension.js",
+		"esbuild-web": "esbuild ./src/web-extension.ts --bundle --tsconfig=./tsconfig.json --external:vscode --format=cjs --platform=browser --outfile=dist/web-extension.js",
+		"publish": "vsce publish",
+		"publish-pre-release": "vsce publish --pre-release",
+		"watch-web": "npm run -S esbuild-web -- --sourcemap --sources-content=false --watch"
+	},
 	"contributes": {
 		"breakpoints": [
 			{
@@ -172,7 +180,11 @@
 			]
 		}
 	},
-	"description": "Starter extension for developing debug adapters for VS Code.",
+	"activationEvents": [
+		"onDebugResolve:mock",
+		"onDebugDynamicConfigurations:mock",
+		"onCommand:extension.mock-debug.getProgramName"
+	],
 	"devDependencies": {
 		"@types/glob": "8.1.0",
 		"@types/node": "22.9.1",
@@ -185,19 +197,7 @@
 		"rimraf": "6.0.1",
 		"url": "0.11.4"
 	},
-	"displayName": "Mock Debug",
 	"icon": "images/mock-debug-icon.png",
-	"main": "./dist/extension.js",
-	"name": "mock-debug",
-	"scripts": {
-		"build": "npm run -S esbuild-base -- --sourcemap --sources-content=false && npm run -S esbuild-web -- --sourcemap --sources-content=false",
-		"compile": "tsc -p ./",
-		"esbuild-base": "esbuild ./src/extension.ts --bundle --tsconfig=./tsconfig.json --external:vscode --format=cjs --platform=node --outfile=dist/extension.js",
-		"esbuild-web": "esbuild ./src/web-extension.ts --bundle --tsconfig=./tsconfig.json --external:vscode --format=cjs --platform=browser --outfile=dist/web-extension.js",
-		"publish": "vsce publish",
-		"publish-pre-release": "vsce publish --pre-release",
-		"watch-web": "npm run -S esbuild-web -- --sourcemap --sources-content=false --watch"
-	},
 	"workspaceTrust": {
 		"request": "never"
 	}
