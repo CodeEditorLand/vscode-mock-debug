@@ -27,6 +27,7 @@ export function activateMockDebug(
 			"extension.mock-debug.runEditorContents",
 			(resource: vscode.Uri) => {
 				let targetResource = resource;
+
 				if (!targetResource && vscode.window.activeTextEditor) {
 					targetResource =
 						vscode.window.activeTextEditor.document.uri;
@@ -49,6 +50,7 @@ export function activateMockDebug(
 			"extension.mock-debug.debugEditorContents",
 			(resource: vscode.Uri) => {
 				let targetResource = resource;
+
 				if (!targetResource && vscode.window.activeTextEditor) {
 					targetResource =
 						vscode.window.activeTextEditor.document.uri;
@@ -68,6 +70,7 @@ export function activateMockDebug(
 			"extension.mock-debug.toggleFormatting",
 			(variable) => {
 				const ds = vscode.debug.activeDebugSession;
+
 				if (ds) {
 					ds.customRequest("toggleFormatting");
 				}
@@ -134,6 +137,7 @@ export function activateMockDebug(
 	context.subscriptions.push(
 		vscode.debug.registerDebugAdapterDescriptorFactory("mock", factory),
 	);
+
 	if ("dispose" in factory) {
 		context.subscriptions.push(factory);
 	}
@@ -147,9 +151,11 @@ export function activateMockDebug(
 				position: vscode.Position,
 			): vscode.ProviderResult<vscode.EvaluatableExpression> {
 				const VARIABLE_REGEXP = /\$[a-z][a-z0-9]*/gi;
+
 				const line = document.lineAt(position.line).text;
 
 				let m: RegExpExecArray | null;
+
 				while ((m = VARIABLE_REGEXP.exec(line))) {
 					const varRange = new vscode.Range(
 						position.line,
@@ -183,11 +189,14 @@ export function activateMockDebug(
 					l++
 				) {
 					const line = document.lineAt(l);
+
 					var regExp = /\$([a-z][a-z0-9]*)/gi; // variables are words starting with '$'
 					do {
 						var m = regExp.exec(line.text);
+
 						if (m) {
 							const varName = m[1];
+
 							const varRange = new vscode.Range(
 								l,
 								m.index,
@@ -232,6 +241,7 @@ class MockConfigurationProvider implements vscode.DebugConfigurationProvider {
 		// if launch.json is missing or empty
 		if (!config.type && !config.request && !config.name) {
 			const editor = vscode.window.activeTextEditor;
+
 			if (editor && editor.document.languageId === "markdown") {
 				config.type = "mock";
 				config.name = "Launch";
@@ -257,6 +267,7 @@ export const workspaceFileAccessor: FileAccessor = {
 	isWindows: typeof process !== "undefined" && process.platform === "win32",
 	async readFile(path: string): Promise<Uint8Array> {
 		let uri: vscode.Uri;
+
 		try {
 			uri = pathToUri(path);
 		} catch (e) {

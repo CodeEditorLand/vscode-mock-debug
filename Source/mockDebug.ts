@@ -155,18 +155,26 @@ export class MockDebugSession extends LoggingDebugSession {
 		});
 		this._runtime.on("output", (type, text, filePath, line, column) => {
 			let category: string;
+
 			switch (type) {
 				case "prio":
 					category = "important";
+
 					break;
+
 				case "out":
 					category = "stdout";
+
 					break;
+
 				case "err":
 					category = "stderr";
+
 					break;
+
 				default:
 					category = "console";
+
 					break;
 			}
 			const e: DebugProtocol.OutputEvent = new OutputEvent(
@@ -370,6 +378,7 @@ export class MockDebugSession extends LoggingDebugSession {
 		args: DebugProtocol.SetBreakpointsArguments,
 	): Promise<void> {
 		const path = args.source.path as string;
+
 		const clientLines = args.lines || [];
 
 		// clear all breakpoints for this file
@@ -381,13 +390,16 @@ export class MockDebugSession extends LoggingDebugSession {
 				path,
 				this.convertClientLineToDebugger(l),
 			);
+
 			const bp = new Breakpoint(
 				verified,
 				this.convertDebuggerLineToClient(line),
 			) as DebugProtocol.Breakpoint;
 			bp.id = id;
+
 			return bp;
 		});
+
 		const actualBreakpoints =
 			await Promise.all<DebugProtocol.Breakpoint>(actualBreakpoints0);
 
@@ -429,6 +441,7 @@ export class MockDebugSession extends LoggingDebugSession {
 		args: DebugProtocol.SetExceptionBreakpointsArguments,
 	): Promise<void> {
 		let namedException: string | undefined = undefined;
+
 		let otherExceptions = false;
 
 		if (args.filterOptions) {
@@ -436,9 +449,12 @@ export class MockDebugSession extends LoggingDebugSession {
 				switch (filterOption.filterId) {
 					case "namedException":
 						namedException = args.filterOptions[0].condition;
+
 						break;
+
 					case "otherExceptions":
 						otherExceptions = true;
+
 						break;
 				}
 			}
@@ -489,7 +505,9 @@ export class MockDebugSession extends LoggingDebugSession {
 	): void {
 		const startFrame =
 			typeof args.startFrame === "number" ? args.startFrame : 0;
+
 		const maxLevels = typeof args.levels === "number" ? args.levels : 1000;
+
 		const endFrame = startFrame + maxLevels;
 
 		const stk = this._runtime.stack(startFrame, endFrame);
@@ -502,6 +520,7 @@ export class MockDebugSession extends LoggingDebugSession {
 					this.createSource(f.file),
 					this.convertDebuggerLineToClient(f.line),
 				);
+
 				if (typeof f.column === "number") {
 					sf.column = this.convertDebuggerColumnToClient(f.column);
 				}
@@ -552,8 +571,10 @@ export class MockDebugSession extends LoggingDebugSession {
 		}: DebugProtocol.WriteMemoryArguments,
 	) {
 		const variable = this._variableHandles.get(Number(memoryReference));
+
 		if (typeof variable === "object") {
 			const decoded = base64.toByteArray(data);
+
 			variable.setMemory(decoded, offset);
 			response.body = { bytesWritten: decoded.length };
 		} else {
@@ -573,6 +594,7 @@ export class MockDebugSession extends LoggingDebugSession {
 		}: DebugProtocol.ReadMemoryArguments,
 	) {
 		const variable = this._variableHandles.get(Number(memoryReference));
+
 		if (typeof variable === "object" && variable.memory) {
 			const memory = variable.memory.subarray(
 				Math.min(offset, variable.memory.length),
@@ -603,6 +625,7 @@ export class MockDebugSession extends LoggingDebugSession {
 		let vs: RuntimeVariable[] = [];
 
 		const v = this._variableHandles.get(args.variablesReference);
+
 		if (v === "locals") {
 			vs = this._runtime.getLocalVariables();
 		} else if (v === "globals") {
@@ -630,6 +653,7 @@ export class MockDebugSession extends LoggingDebugSession {
 		args: DebugProtocol.SetVariableArguments,
 	): void {
 		const container = this._variableHandles.get(args.variablesReference);
+
 		const rv =
 			container === "locals"
 				? this._runtime.getLocalVariable(args.name)
@@ -718,6 +742,7 @@ export class MockDebugSession extends LoggingDebugSession {
 		args: DebugProtocol.EvaluateArguments,
 	): Promise<void> {
 		let reply: string | undefined;
+
 		let rv: RuntimeVariable | undefined;
 
 		switch (args.context) {
@@ -725,11 +750,13 @@ export class MockDebugSession extends LoggingDebugSession {
 				// handle some REPL commands:
 				// 'evaluate' supports to create and delete breakpoints from the 'repl':
 				const matches = /new +([0-9]+)/.exec(args.expression);
+
 				if (matches && matches.length === 2) {
 					const mbp = await this._runtime.setBreakPoint(
 						this._runtime.sourceFile,
 						this.convertClientLineToDebugger(parseInt(matches[1])),
 					);
+
 					const bp = new Breakpoint(
 						mbp.verified,
 						this.convertDebuggerLineToClient(mbp.line),
@@ -741,6 +768,7 @@ export class MockDebugSession extends LoggingDebugSession {
 					reply = `breakpoint created`;
 				} else {
 					const matches = /del +([0-9]+)/.exec(args.expression);
+
 					if (matches && matches.length === 2) {
 						const mbp = this._runtime.clearBreakPoint(
 							this._runtime.sourceFile,
@@ -748,6 +776,7 @@ export class MockDebugSession extends LoggingDebugSession {
 								parseInt(matches[1]),
 							),
 						);
+
 						if (mbp) {
 							const bp = new Breakpoint(
 								false,
@@ -758,6 +787,7 @@ export class MockDebugSession extends LoggingDebugSession {
 						}
 					} else {
 						const matches = /progress/.exec(args.expression);
+
 						if (matches && matches.length === 1) {
 							if (this._reportProgress) {
 								reply = `progress started`;
@@ -812,6 +842,7 @@ export class MockDebugSession extends LoggingDebugSession {
 			const rv = this._runtime.getLocalVariable(
 				args.expression.substr(1),
 			);
+
 			if (rv) {
 				rv.value = this.convertToRuntime(args.value);
 				response.body = this.convertFromRuntime(rv);
@@ -842,6 +873,7 @@ export class MockDebugSession extends LoggingDebugSession {
 		const title = this._isProgressCancellable
 			? "Cancellable operation"
 			: "Long running operation";
+
 		const startEvent: DebugProtocol.ProgressStartEvent =
 			new ProgressStartEvent(ID, title);
 		startEvent.body.cancellable = this._isProgressCancellable;
@@ -854,10 +886,12 @@ export class MockDebugSession extends LoggingDebugSession {
 		for (let i = 0; i < 100; i++) {
 			await timeout(500);
 			this.sendEvent(new ProgressUpdateEvent(ID, `progress: ${i}`));
+
 			if (this._cancelledProgressId === ID) {
 				endMessage = "progress cancelled";
 				this._cancelledProgressId = undefined;
 				this.sendEvent(new OutputEvent(`cancel progress: ${ID}\n`));
+
 				break;
 			}
 		}
@@ -880,6 +914,7 @@ export class MockDebugSession extends LoggingDebugSession {
 
 		if (args.variablesReference && args.name) {
 			const v = this._variableHandles.get(args.variablesReference);
+
 			if (v === "globals") {
 				response.body.dataId = args.name;
 				response.body.description = args.name;
@@ -973,11 +1008,15 @@ export class MockDebugSession extends LoggingDebugSession {
 		args: DebugProtocol.DisassembleArguments,
 	) {
 		const memoryInt = args.memoryReference.slice(3);
+
 		const baseAddress = parseInt(memoryInt);
+
 		const offset = args.instructionOffset || 0;
+
 		const count = args.instructionCount;
 
 		const isHex = memoryInt.startsWith("0x");
+
 		const pad = isHex ? memoryInt.length - 2 : memoryInt.length;
 
 		const loc = this.createSource(this._runtime.sourceFile);
@@ -990,7 +1029,9 @@ export class MockDebugSession extends LoggingDebugSession {
 				let address = Math.abs(instruction.address)
 					.toString(isHex ? 16 : 10)
 					.padStart(pad, "0");
+
 				const sign = instruction.address < 0 ? "-" : "";
+
 				const instr: DebugProtocol.DisassembledInstruction = {
 					address: sign + (isHex ? `0x${address}` : `${address}`),
 					instruction: instruction.instruction,
@@ -1025,7 +1066,9 @@ export class MockDebugSession extends LoggingDebugSession {
 		// set instruction breakpoints
 		const breakpoints = args.breakpoints.map((ibp) => {
 			const address = parseInt(ibp.instructionReference.slice(3));
+
 			const offset = ibp.offset || 0;
+
 			return <DebugProtocol.Breakpoint>{
 				verified: this._runtime.setInstructionBreakpoint(
 					address + offset,
@@ -1046,6 +1089,7 @@ export class MockDebugSession extends LoggingDebugSession {
 	) {
 		if (command === "toggleFormatting") {
 			this._valuesInHex = !this._valuesInHex;
+
 			if (this._useInvalidatedEvent) {
 				this.sendEvent(new InvalidatedEvent(["variables"]));
 			}
@@ -1070,6 +1114,7 @@ export class MockDebugSession extends LoggingDebugSession {
 			return value.substr(1, value.length - 2);
 		}
 		const n = parseFloat(value);
+
 		if (!isNaN(n)) {
 			return n;
 		}
@@ -1112,14 +1157,20 @@ export class MockDebugSession extends LoggingDebugSession {
 							dapVariable.type = "float";
 						}
 						break;
+
 					case "string":
 						dapVariable.value = `"${v.value}"`;
+
 						break;
+
 					case "boolean":
 						dapVariable.value = v.value ? "true" : "false";
+
 						break;
+
 					default:
 						dapVariable.value = typeof v.value;
+
 						break;
 				}
 			}

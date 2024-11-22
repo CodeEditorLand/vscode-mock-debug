@@ -41,6 +41,7 @@ export function activate(context: vscode.ExtensionContext) {
 				context,
 				new MockDebugAdapterServerDescriptorFactory(),
 			);
+
 			break;
 
 		case "namedPipeServer":
@@ -49,17 +50,20 @@ export function activate(context: vscode.ExtensionContext) {
 				context,
 				new MockDebugAdapterNamedPipeServerDescriptorFactory(),
 			);
+
 			break;
 
 		case "external":
 		default:
 			// run the debug adapter as a separate process
 			activateMockDebug(context, new DebugAdapterExecutableFactory());
+
 			break;
 
 		case "inline":
 			// run the debug adapter inside the extension and directly talk to it
 			activateMockDebug(context);
+
 			break;
 	}
 }
@@ -83,7 +87,9 @@ class DebugAdapterExecutableFactory
 		// use the executable specified in the package.json if it exists or determine it based on some other information (e.g. the session)
 		if (!executable) {
 			const command = "absolute path to my DA executable";
+
 			const args = ["some args", "another arg"];
+
 			const options = {
 				cwd: "working directory for executable",
 				env: { "envVariable": "some value" },
@@ -143,6 +149,7 @@ class MockDebugAdapterNamedPipeServerDescriptorFactory
 		if (!this.server) {
 			// start listening on a random named pipe path
 			const pipeName = randomBytes(10).toString("utf8");
+
 			const pipePath =
 				platform === "win32"
 					? join("\\\\.\\pipe\\", pipeName)

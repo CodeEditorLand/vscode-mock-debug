@@ -75,6 +75,7 @@ export class RuntimeVariable {
 
 	public setMemory(data: Uint8Array, offset = 0) {
 		const memory = this.memory;
+
 		if (!memory) {
 			return;
 		}
@@ -225,6 +226,7 @@ export class MockRuntime extends EventEmitter {
 				this.currentLine = 0;
 				this.currentColumn = undefined;
 				this.sendEvent("stopOnEntry");
+
 				return true;
 			}
 		} else {
@@ -234,6 +236,7 @@ export class MockRuntime extends EventEmitter {
 				// no more lines: run to end
 				this.currentColumn = undefined;
 				this.sendEvent("end");
+
 				return true;
 			}
 		}
@@ -268,6 +271,7 @@ export class MockRuntime extends EventEmitter {
 	public stepOut() {
 		if (typeof this.currentColumn === "number") {
 			this.currentColumn -= 1;
+
 			if (this.currentColumn === 0) {
 				this.currentColumn = undefined;
 			}
@@ -277,6 +281,7 @@ export class MockRuntime extends EventEmitter {
 
 	public getStepInTargets(frameId: number): IRuntimeStepInTargets[] {
 		const line = this.getLine();
+
 		const words = this.getWords(this.currentLine, line);
 
 		// return nothing if frameId is out of range
@@ -300,6 +305,7 @@ export class MockRuntime extends EventEmitter {
 	 */
 	public stack(startFrame: number, endFrame: number): IRuntimeStack {
 		const line = this.getLine();
+
 		const words = this.getWords(this.currentLine, line);
 		words.push({ name: "BOTTOM", line: -1, index: -1 }); // add a sentinel so that the stack is never empty...
 
@@ -357,7 +363,9 @@ export class MockRuntime extends EventEmitter {
 			line,
 			id: this.breakpointId++,
 		};
+
 		let bps = this.breakPoints.get(path);
+
 		if (!bps) {
 			bps = new Array<IRuntimeBreakpoint>();
 			this.breakPoints.set(path, bps);
@@ -377,11 +385,14 @@ export class MockRuntime extends EventEmitter {
 		line: number,
 	): IRuntimeBreakpoint | undefined {
 		const bps = this.breakPoints.get(this.normalizePathAndCasing(path));
+
 		if (bps) {
 			const index = bps.findIndex((bp) => bp.line === line);
+
 			if (index >= 0) {
 				const bp = bps[index];
 				bps.splice(index, 1);
+
 				return bp;
 			}
 		}
@@ -399,6 +410,7 @@ export class MockRuntime extends EventEmitter {
 		const x = accessType === "readWrite" ? "read write" : accessType;
 
 		const t = this.breakAddresses.get(address);
+
 		if (t) {
 			if (t !== x) {
 				this.breakAddresses.set(address, "read write");
@@ -423,6 +435,7 @@ export class MockRuntime extends EventEmitter {
 
 	public setInstructionBreakpoint(address: number): boolean {
 		this.instructionBreakpoints.add(address);
+
 		return true;
 	}
 
@@ -437,6 +450,7 @@ export class MockRuntime extends EventEmitter {
 
 		for (let i = 0; i < 10; i++) {
 			a.push(new RuntimeVariable(`global_${i}`, i));
+
 			if (cancellationToken && cancellationToken()) {
 				break;
 			}
@@ -492,8 +506,11 @@ export class MockRuntime extends EventEmitter {
 	private getWords(l: number, line: string): Word[] {
 		// break line into words
 		const WORD_REGEXP = /[a-z]+/gi;
+
 		const words: Word[] = [];
+
 		let match: RegExpExecArray | null;
+
 		while ((match = WORD_REGEXP.exec(line))) {
 			words.push({ name: match[0], line: l, index: match.index });
 		}
@@ -518,7 +535,9 @@ export class MockRuntime extends EventEmitter {
 
 		for (let l = 0; l < this.sourceLines.length; l++) {
 			this.starts.push(this.instructions.length);
+
 			const words = this.getWords(l, this.sourceLines[l]);
+
 			for (let word of words) {
 				this.instructions.push(word);
 			}
@@ -537,8 +556,10 @@ export class MockRuntime extends EventEmitter {
 		) {
 			// is there a source breakpoint?
 			const breakpoints = this.breakPoints.get(this._sourceFile);
+
 			if (breakpoints) {
 				const bps = breakpoints.filter((bp) => bp.line === ln);
+
 				if (bps.length > 0) {
 					// send 'stopped' event
 					this.sendEvent("stopOnBreakpoint");
@@ -551,18 +572,22 @@ export class MockRuntime extends EventEmitter {
 					}
 
 					this.currentLine = ln;
+
 					return true;
 				}
 			}
 
 			const line = this.getLine(ln);
+
 			if (line.length > 0) {
 				this.currentLine = ln;
+
 				break;
 			}
 		}
 		if (stepEvent) {
 			this.sendEvent(stepEvent);
+
 			return true;
 		}
 		return false;
@@ -580,8 +605,10 @@ export class MockRuntime extends EventEmitter {
 				: this.instruction < this.ends[ln]
 		) {
 			reverse ? this.instruction-- : this.instruction++;
+
 			if (this.instructionBreakpoints.has(this.instruction)) {
 				this.sendEvent("stopOnInstructionBreakpoint");
+
 				return true;
 			}
 		}
@@ -591,12 +618,15 @@ export class MockRuntime extends EventEmitter {
 		// find variable accesses
 		let reg0 =
 			/\$([a-z][a-z0-9]*)(=(false|true|[0-9]+(\.[0-9]+)?|\".*\"|\{.*\}))?/gi;
+
 		let matches0: RegExpExecArray | null;
+
 		while ((matches0 = reg0.exec(line))) {
 			if (matches0.length === 5) {
 				let access: string | undefined;
 
 				const name = matches0[1];
+
 				const value = matches0[3];
 
 				let v = new RuntimeVariable(name, value);
@@ -632,8 +662,10 @@ export class MockRuntime extends EventEmitter {
 				}
 
 				const accessType = this.breakAddresses.get(name);
+
 				if (access && accessType && accessType.indexOf(access) >= 0) {
 					this.sendEvent("stopOnDataBreakpoint", access);
+
 					return true;
 				}
 			}
@@ -641,7 +673,9 @@ export class MockRuntime extends EventEmitter {
 
 		// if 'log(...)' found in source -> send argument to debug console
 		const reg1 = /(log|prio|out|err)\(([^\)]*)\)/g;
+
 		let matches1: RegExpExecArray | null;
+
 		while ((matches1 = reg1.exec(line))) {
 			if (matches1.length === 3) {
 				this.sendEvent(
@@ -657,14 +691,18 @@ export class MockRuntime extends EventEmitter {
 
 		// if pattern 'exception(...)' found in source -> throw named exception
 		const matches2 = /exception\((.*)\)/.exec(line);
+
 		if (matches2 && matches2.length === 2) {
 			const exception = matches2[1].trim();
+
 			if (this.namedException === exception) {
 				this.sendEvent("stopOnException", exception);
+
 				return true;
 			} else {
 				if (this.otherExceptions) {
 					this.sendEvent("stopOnException", undefined);
+
 					return true;
 				}
 			}
@@ -673,6 +711,7 @@ export class MockRuntime extends EventEmitter {
 			if (line.indexOf("exception") >= 0) {
 				if (this.otherExceptions) {
 					this.sendEvent("stopOnException", undefined);
+
 					return true;
 				}
 			}
@@ -684,6 +723,7 @@ export class MockRuntime extends EventEmitter {
 
 	private async verifyBreakpoints(path: string): Promise<void> {
 		const bps = this.breakPoints.get(path);
+
 		if (bps) {
 			await this.loadSource(path);
 			bps.forEach((bp) => {

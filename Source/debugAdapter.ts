@@ -38,9 +38,11 @@ const fsAccessor: FileAccessor = {
 
 // first parse command line arguments to see whether the debug adapter should run as a server
 let port = 0;
+
 const args = process.argv.slice(2);
 args.forEach(function (val, index, array) {
 	const portMatch = /^--server=(\d{4,5})$/.exec(val);
+
 	if (portMatch) {
 		port = parseInt(portMatch[1], 10);
 	}
@@ -54,6 +56,7 @@ if (port > 0) {
 		socket.on("end", () => {
 			console.error(">> client connection closed\n");
 		});
+
 		const session = new MockDebugSession(fsAccessor);
 		session.setRunAsServer(true);
 		session.start(socket, socket);
