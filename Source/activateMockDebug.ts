@@ -32,6 +32,7 @@ export function activateMockDebug(
 					targetResource =
 						vscode.window.activeTextEditor.document.uri;
 				}
+
 				if (targetResource) {
 					vscode.debug.startDebugging(
 						undefined,
@@ -55,6 +56,7 @@ export function activateMockDebug(
 					targetResource =
 						vscode.window.activeTextEditor.document.uri;
 				}
+
 				if (targetResource) {
 					vscode.debug.startDebugging(undefined, {
 						type: "mock",
@@ -93,6 +95,7 @@ export function activateMockDebug(
 
 	// register a configuration provider for 'mock' debug type
 	const provider = new MockConfigurationProvider();
+
 	context.subscriptions.push(
 		vscode.debug.registerDebugConfigurationProvider("mock", provider),
 	);
@@ -134,6 +137,7 @@ export function activateMockDebug(
 	if (!factory) {
 		factory = new InlineDebugAdapterFactory();
 	}
+
 	context.subscriptions.push(
 		vscode.debug.registerDebugAdapterDescriptorFactory("mock", factory),
 	);
@@ -168,6 +172,7 @@ export function activateMockDebug(
 						return new vscode.EvaluatableExpression(varRange);
 					}
 				}
+
 				return undefined;
 			},
 		}),
@@ -185,7 +190,9 @@ export function activateMockDebug(
 
 				for (
 					let l = viewport.start.line;
+
 					l <= context.stoppedLocation.end.line;
+
 					l++
 				) {
 					const line = document.lineAt(l);
@@ -244,9 +251,13 @@ class MockConfigurationProvider implements vscode.DebugConfigurationProvider {
 
 			if (editor && editor.document.languageId === "markdown") {
 				config.type = "mock";
+
 				config.name = "Launch";
+
 				config.request = "launch";
+
 				config.program = "${file}";
+
 				config.stopOnEntry = true;
 			}
 		}

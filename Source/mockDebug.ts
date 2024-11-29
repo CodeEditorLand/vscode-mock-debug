@@ -82,11 +82,15 @@ export class MockDebugSession extends LoggingDebugSession {
 	private _cancellationTokens = new Map<number, boolean>();
 
 	private _reportProgress = false;
+
 	private _progressId = 10000;
+
 	private _cancelledProgressId: string | undefined = undefined;
+
 	private _isProgressCancellable = true;
 
 	private _valuesInHex = false;
+
 	private _useInvalidatedEvent = false;
 
 	private _addressesInHex = true;
@@ -100,6 +104,7 @@ export class MockDebugSession extends LoggingDebugSession {
 
 		// this debugger uses zero-based lines and columns
 		this.setDebuggerLinesStartAt1(false);
+
 		this.setDebuggerColumnsStartAt1(false);
 
 		this._runtime = new MockRuntime(fileAccessor);
@@ -110,19 +115,23 @@ export class MockDebugSession extends LoggingDebugSession {
 				new StoppedEvent("entry", MockDebugSession.threadID),
 			);
 		});
+
 		this._runtime.on("stopOnStep", () => {
 			this.sendEvent(new StoppedEvent("step", MockDebugSession.threadID));
 		});
+
 		this._runtime.on("stopOnBreakpoint", () => {
 			this.sendEvent(
 				new StoppedEvent("breakpoint", MockDebugSession.threadID),
 			);
 		});
+
 		this._runtime.on("stopOnDataBreakpoint", () => {
 			this.sendEvent(
 				new StoppedEvent("data breakpoint", MockDebugSession.threadID),
 			);
 		});
+
 		this._runtime.on("stopOnInstructionBreakpoint", () => {
 			this.sendEvent(
 				new StoppedEvent(
@@ -131,6 +140,7 @@ export class MockDebugSession extends LoggingDebugSession {
 				),
 			);
 		});
+
 		this._runtime.on("stopOnException", (exception) => {
 			if (exception) {
 				this.sendEvent(
@@ -145,6 +155,7 @@ export class MockDebugSession extends LoggingDebugSession {
 				);
 			}
 		});
+
 		this._runtime.on("breakpointValidated", (bp: IRuntimeBreakpoint) => {
 			this.sendEvent(
 				new BreakpointEvent("changed", {
@@ -153,6 +164,7 @@ export class MockDebugSession extends LoggingDebugSession {
 				} as DebugProtocol.Breakpoint),
 			);
 		});
+
 		this._runtime.on("output", (type, text, filePath, line, column) => {
 			let category: string;
 
@@ -177,6 +189,7 @@ export class MockDebugSession extends LoggingDebugSession {
 
 					break;
 			}
+
 			const e: DebugProtocol.OutputEvent = new OutputEvent(
 				`${text}\n`,
 				category,
@@ -188,14 +201,19 @@ export class MockDebugSession extends LoggingDebugSession {
 				text === "end"
 			) {
 				e.body.group = text;
+
 				e.body.output = `group-${text}\n`;
 			}
 
 			e.body.source = this.createSource(filePath);
+
 			e.body.line = this.convertDebuggerLineToClient(line);
+
 			e.body.column = this.convertDebuggerColumnToClient(column);
+
 			this.sendEvent(e);
 		});
+
 		this._runtime.on("end", () => {
 			this.sendEvent(new TerminatedEvent());
 		});
@@ -212,6 +230,7 @@ export class MockDebugSession extends LoggingDebugSession {
 		if (args.supportsProgressReporting) {
 			this._reportProgress = true;
 		}
+
 		if (args.supportsInvalidatedEvent) {
 			this._useInvalidatedEvent = true;
 		}
@@ -233,6 +252,7 @@ export class MockDebugSession extends LoggingDebugSession {
 
 		// make VS Code support completion in REPL
 		response.body.supportsCompletionsRequest = true;
+
 		response.body.completionTriggerCharacters = [".", "["];
 
 		// make VS Code send cancel request
@@ -246,6 +266,7 @@ export class MockDebugSession extends LoggingDebugSession {
 
 		// the adapter defines two exceptions filters, one with support for conditions.
 		response.body.supportsExceptionFilterOptions = true;
+
 		response.body.exceptionBreakpointFilters = [
 			{
 				filter: "namedException",
@@ -275,16 +296,22 @@ export class MockDebugSession extends LoggingDebugSession {
 
 		// make VS Code send disassemble request
 		response.body.supportsDisassembleRequest = true;
+
 		response.body.supportsSteppingGranularity = true;
+
 		response.body.supportsInstructionBreakpoints = true;
 
 		// make VS Code able to read and write variable memory
 		response.body.supportsReadMemoryRequest = true;
+
 		response.body.supportsWriteMemoryRequest = true;
 
 		response.body.supportSuspendDebuggee = true;
+
 		response.body.supportTerminateDebuggee = true;
+
 		response.body.supportsFunctionBreakpoints = true;
+
 		response.body.supportsDelayedStackTraceLoading = true;
 
 		this.sendResponse(response);
@@ -395,6 +422,7 @@ export class MockDebugSession extends LoggingDebugSession {
 				verified,
 				this.convertDebuggerLineToClient(line),
 			) as DebugProtocol.Breakpoint;
+
 			bp.id = id;
 
 			return bp;
@@ -407,6 +435,7 @@ export class MockDebugSession extends LoggingDebugSession {
 		response.body = {
 			breakpoints: actualBreakpoints,
 		};
+
 		this.sendResponse(response);
 	}
 
@@ -420,6 +449,7 @@ export class MockDebugSession extends LoggingDebugSession {
 				args.source.path,
 				this.convertClientLineToDebugger(args.line),
 			);
+
 			response.body = {
 				breakpoints: bps.map((col) => {
 					return {
@@ -433,6 +463,7 @@ export class MockDebugSession extends LoggingDebugSession {
 				breakpoints: [],
 			};
 		}
+
 		this.sendResponse(response);
 	}
 
@@ -485,6 +516,7 @@ export class MockDebugSession extends LoggingDebugSession {
 				stackTrace: "stack frame 1\nstack frame 2",
 			},
 		};
+
 		this.sendResponse(response);
 	}
 
@@ -496,6 +528,7 @@ export class MockDebugSession extends LoggingDebugSession {
 				new Thread(MockDebugSession.threadID + 1, "thread 2"),
 			],
 		};
+
 		this.sendResponse(response);
 	}
 
@@ -524,9 +557,12 @@ export class MockDebugSession extends LoggingDebugSession {
 				if (typeof f.column === "number") {
 					sf.column = this.convertDebuggerColumnToClient(f.column);
 				}
+
 				if (typeof f.instruction === "number") {
 					const address = this.formatAddress(f.instruction);
+
 					sf.name = `${f.name} ${address}`;
+
 					sf.instructionPointerReference = address;
 				}
 
@@ -538,6 +574,7 @@ export class MockDebugSession extends LoggingDebugSession {
 			//totalFrames: 1000000 			// not the correct size, should result in a max. of two requests
 			//totalFrames: endFrame + 20 	// dynamically increases the size with every requested chunk, results in paging
 		};
+
 		this.sendResponse(response);
 	}
 
@@ -559,6 +596,7 @@ export class MockDebugSession extends LoggingDebugSession {
 				),
 			],
 		};
+
 		this.sendResponse(response);
 	}
 
@@ -576,12 +614,14 @@ export class MockDebugSession extends LoggingDebugSession {
 			const decoded = base64.toByteArray(data);
 
 			variable.setMemory(decoded, offset);
+
 			response.body = { bytesWritten: decoded.length };
 		} else {
 			response.body = { bytesWritten: 0 };
 		}
 
 		this.sendResponse(response);
+
 		this.sendEvent(new InvalidatedEvent(["variables"]));
 	}
 
@@ -631,9 +671,11 @@ export class MockDebugSession extends LoggingDebugSession {
 		} else if (v === "globals") {
 			if (request) {
 				this._cancellationTokens.set(request.seq, false);
+
 				vs = await this._runtime.getGlobalVariables(
 					() => !!this._cancellationTokens.get(request.seq),
 				);
+
 				this._cancellationTokens.delete(request.seq);
 			} else {
 				vs = await this._runtime.getGlobalVariables();
@@ -645,6 +687,7 @@ export class MockDebugSession extends LoggingDebugSession {
 		response.body = {
 			variables: vs.map((v) => this.convertFromRuntime(v)),
 		};
+
 		this.sendResponse(response);
 	}
 
@@ -664,6 +707,7 @@ export class MockDebugSession extends LoggingDebugSession {
 
 		if (rv) {
 			rv.value = this.convertToRuntime(args.value);
+
 			response.body = this.convertFromRuntime(rv);
 
 			if (rv.memory && rv.reference) {
@@ -681,6 +725,7 @@ export class MockDebugSession extends LoggingDebugSession {
 		args: DebugProtocol.ContinueArguments,
 	): void {
 		this._runtime.continue(false);
+
 		this.sendResponse(response);
 	}
 
@@ -689,6 +734,7 @@ export class MockDebugSession extends LoggingDebugSession {
 		args: DebugProtocol.ReverseContinueArguments,
 	): void {
 		this._runtime.continue(true);
+
 		this.sendResponse(response);
 	}
 
@@ -697,6 +743,7 @@ export class MockDebugSession extends LoggingDebugSession {
 		args: DebugProtocol.NextArguments,
 	): void {
 		this._runtime.step(args.granularity === "instruction", false);
+
 		this.sendResponse(response);
 	}
 
@@ -705,6 +752,7 @@ export class MockDebugSession extends LoggingDebugSession {
 		args: DebugProtocol.StepBackArguments,
 	): void {
 		this._runtime.step(args.granularity === "instruction", true);
+
 		this.sendResponse(response);
 	}
 
@@ -713,11 +761,13 @@ export class MockDebugSession extends LoggingDebugSession {
 		args: DebugProtocol.StepInTargetsArguments,
 	) {
 		const targets = this._runtime.getStepInTargets(args.frameId);
+
 		response.body = {
 			targets: targets.map((t) => {
 				return { id: t.id, label: t.label };
 			}),
 		};
+
 		this.sendResponse(response);
 	}
 
@@ -726,6 +776,7 @@ export class MockDebugSession extends LoggingDebugSession {
 		args: DebugProtocol.StepInArguments,
 	): void {
 		this._runtime.stepIn(args.targetId);
+
 		this.sendResponse(response);
 	}
 
@@ -734,6 +785,7 @@ export class MockDebugSession extends LoggingDebugSession {
 		args: DebugProtocol.StepOutArguments,
 	): void {
 		this._runtime.stepOut();
+
 		this.sendResponse(response);
 	}
 
@@ -763,8 +815,11 @@ export class MockDebugSession extends LoggingDebugSession {
 						undefined,
 						this.createSource(this._runtime.sourceFile),
 					) as DebugProtocol.Breakpoint;
+
 					bp.id = mbp.id;
+
 					this.sendEvent(new BreakpointEvent("new", bp));
+
 					reply = `breakpoint created`;
 				} else {
 					const matches = /del +([0-9]+)/.exec(args.expression);
@@ -781,8 +836,11 @@ export class MockDebugSession extends LoggingDebugSession {
 							const bp = new Breakpoint(
 								false,
 							) as DebugProtocol.Breakpoint;
+
 							bp.id = mbp.id;
+
 							this.sendEvent(new BreakpointEvent("removed", bp));
+
 							reply = `breakpoint deleted`;
 						}
 					} else {
@@ -791,6 +849,7 @@ export class MockDebugSession extends LoggingDebugSession {
 						if (matches && matches.length === 1) {
 							if (this._reportProgress) {
 								reply = `progress started`;
+
 								this.progressSequence();
 							} else {
 								reply = `frontend doesn't support progress (capability 'supportsProgressReporting' not set)`;
@@ -811,11 +870,13 @@ export class MockDebugSession extends LoggingDebugSession {
 						this.convertToRuntime(args.expression),
 					);
 				}
+
 				break;
 		}
 
 		if (rv) {
 			const v = this.convertFromRuntime(rv);
+
 			response.body = {
 				result: v.value,
 				type: v.type,
@@ -845,7 +906,9 @@ export class MockDebugSession extends LoggingDebugSession {
 
 			if (rv) {
 				rv.value = this.convertToRuntime(args.value);
+
 				response.body = this.convertFromRuntime(rv);
+
 				this.sendResponse(response);
 			} else {
 				this.sendErrorResponse(response, {
@@ -876,26 +939,35 @@ export class MockDebugSession extends LoggingDebugSession {
 
 		const startEvent: DebugProtocol.ProgressStartEvent =
 			new ProgressStartEvent(ID, title);
+
 		startEvent.body.cancellable = this._isProgressCancellable;
+
 		this._isProgressCancellable = !this._isProgressCancellable;
+
 		this.sendEvent(startEvent);
+
 		this.sendEvent(new OutputEvent(`start progress: ${ID}\n`));
 
 		let endMessage = "progress ended";
 
 		for (let i = 0; i < 100; i++) {
 			await timeout(500);
+
 			this.sendEvent(new ProgressUpdateEvent(ID, `progress: ${i}`));
 
 			if (this._cancelledProgressId === ID) {
 				endMessage = "progress cancelled";
+
 				this._cancelledProgressId = undefined;
+
 				this.sendEvent(new OutputEvent(`cancel progress: ${ID}\n`));
 
 				break;
 			}
 		}
+
 		this.sendEvent(new ProgressEndEvent(ID, endMessage));
+
 		this.sendEvent(new OutputEvent(`end progress: ${ID}\n`));
 
 		this._cancelledProgressId = undefined;
@@ -917,13 +989,19 @@ export class MockDebugSession extends LoggingDebugSession {
 
 			if (v === "globals") {
 				response.body.dataId = args.name;
+
 				response.body.description = args.name;
+
 				response.body.accessTypes = ["write"];
+
 				response.body.canPersist = true;
 			} else {
 				response.body.dataId = args.name;
+
 				response.body.description = args.name;
+
 				response.body.accessTypes = ["read", "write", "readWrite"];
+
 				response.body.canPersist = true;
 			}
 		}
@@ -947,6 +1025,7 @@ export class MockDebugSession extends LoggingDebugSession {
 				dbp.dataId,
 				dbp.accessType || "write",
 			);
+
 			response.body.breakpoints.push({
 				verified: ok,
 			});
@@ -988,6 +1067,7 @@ export class MockDebugSession extends LoggingDebugSession {
 				},
 			],
 		};
+
 		this.sendResponse(response);
 	}
 
@@ -998,6 +1078,7 @@ export class MockDebugSession extends LoggingDebugSession {
 		if (args.requestId) {
 			this._cancellationTokens.set(args.requestId, true);
 		}
+
 		if (args.progressId) {
 			this._cancelledProgressId = args.progressId;
 		}
@@ -1042,17 +1123,21 @@ export class MockDebugSession extends LoggingDebugSession {
 					lastLine !== instruction.line
 				) {
 					lastLine = instruction.line;
+
 					instr.location = loc;
+
 					instr.line = this.convertDebuggerLineToClient(
 						instruction.line,
 					);
 				}
+
 				return instr;
 			});
 
 		response.body = {
 			instructions: instructions,
 		};
+
 		this.sendResponse(response);
 	}
 
@@ -1079,6 +1164,7 @@ export class MockDebugSession extends LoggingDebugSession {
 		response.body = {
 			breakpoints: breakpoints,
 		};
+
 		this.sendResponse(response);
 	}
 
@@ -1093,6 +1179,7 @@ export class MockDebugSession extends LoggingDebugSession {
 			if (this._useInvalidatedEvent) {
 				this.sendEvent(new InvalidatedEvent(["variables"]));
 			}
+
 			this.sendResponse(response);
 		} else {
 			super.customRequest(command, response, args);
@@ -1107,17 +1194,21 @@ export class MockDebugSession extends LoggingDebugSession {
 		if (value === "true") {
 			return true;
 		}
+
 		if (value === "false") {
 			return false;
 		}
+
 		if (value[0] === "'" || value[0] === '"') {
 			return value.substr(1, value.length - 2);
 		}
+
 		const n = parseFloat(value);
 
 		if (!isNaN(n)) {
 			return n;
 		}
+
 		return value;
 	}
 
@@ -1137,12 +1228,16 @@ export class MockDebugSession extends LoggingDebugSession {
 			v.reference ??= this._variableHandles.create(
 				new RuntimeVariable("", [new RuntimeVariable("", v.value)]),
 			);
+
 			dapVariable.variablesReference = v.reference;
+
 			dapVariable.presentationHint = { lazy: true };
 		} else {
 			if (Array.isArray(v.value)) {
 				dapVariable.value = "Object";
+
 				v.reference ??= this._variableHandles.create(v);
+
 				dapVariable.variablesReference = v.reference;
 			} else {
 				switch (typeof v.value) {
@@ -1154,8 +1249,10 @@ export class MockDebugSession extends LoggingDebugSession {
 							dapVariable.type = "integer";
 						} else {
 							dapVariable.value = v.value.toString();
+
 							dapVariable.type = "float";
 						}
+
 						break;
 
 					case "string":
@@ -1178,6 +1275,7 @@ export class MockDebugSession extends LoggingDebugSession {
 
 		if (v.memory) {
 			v.reference ??= this._variableHandles.create(v);
+
 			dapVariable.memoryReference = String(v.reference);
 		}
 

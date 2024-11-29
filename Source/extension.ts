@@ -94,6 +94,7 @@ class DebugAdapterExecutableFactory
 				cwd: "working directory for executable",
 				env: { "envVariable": "some value" },
 			};
+
 			executable = new vscode.DebugAdapterExecutable(
 				command,
 				args,
@@ -119,7 +120,9 @@ class MockDebugAdapterServerDescriptorFactory
 			// start listening on a random port
 			this.server = Net.createServer((socket) => {
 				const session = new MockDebugSession(workspaceFileAccessor);
+
 				session.setRunAsServer(true);
+
 				session.start(socket as NodeJS.ReadableStream, socket);
 			}).listen(0);
 		}
@@ -157,7 +160,9 @@ class MockDebugAdapterNamedPipeServerDescriptorFactory
 
 			this.server = Net.createServer((socket) => {
 				const session = new MockDebugSession(workspaceFileAccessor);
+
 				session.setRunAsServer(true);
+
 				session.start(<NodeJS.ReadableStream>socket, socket);
 			}).listen(pipePath);
 		}

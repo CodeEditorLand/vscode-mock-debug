@@ -51,21 +51,27 @@ args.forEach(function (val, index, array) {
 if (port > 0) {
 	// start a server that creates a new session for every connection request
 	console.error(`waiting for debug protocol on port ${port}`);
+
 	Net.createServer((socket) => {
 		console.error(">> accepted connection from client");
+
 		socket.on("end", () => {
 			console.error(">> client connection closed\n");
 		});
 
 		const session = new MockDebugSession(fsAccessor);
+
 		session.setRunAsServer(true);
+
 		session.start(socket, socket);
 	}).listen(port);
 } else {
 	// start a single session that communicates via stdin/stdout
 	const session = new MockDebugSession(fsAccessor);
+
 	process.on("SIGTERM", () => {
 		session.shutdown();
 	});
+
 	session.start(process.stdin, process.stdout);
 }

@@ -6,38 +6,51 @@ import { EventEmitter } from "events";
 
 export interface FileAccessor {
 	isWindows: boolean;
+
 	readFile(path: string): Promise<Uint8Array>;
+
 	writeFile(path: string, contents: Uint8Array): Promise<void>;
 }
 
 export interface IRuntimeBreakpoint {
 	id: number;
+
 	line: number;
+
 	verified: boolean;
 }
 
 interface IRuntimeStepInTargets {
 	id: number;
+
 	label: string;
 }
 
 interface IRuntimeStackFrame {
 	index: number;
+
 	name: string;
+
 	file: string;
+
 	line: number;
+
 	column?: number;
+
 	instruction?: number;
 }
 
 interface IRuntimeStack {
 	count: number;
+
 	frames: IRuntimeStackFrame[];
 }
 
 interface RuntimeDisassembledInstruction {
 	address: number;
+
 	instruction: string;
+
 	line?: number;
 }
 
@@ -58,6 +71,7 @@ export class RuntimeVariable {
 
 	public set value(value: IRuntimeVariableType) {
 		this._value = value;
+
 		this._memory = undefined;
 	}
 
@@ -65,6 +79,7 @@ export class RuntimeVariable {
 		if (this._memory === undefined && typeof this._value === "string") {
 			this._memory = new TextEncoder().encode(this._value);
 		}
+
 		return this._memory;
 	}
 
@@ -81,14 +96,18 @@ export class RuntimeVariable {
 		}
 
 		memory.set(data, offset);
+
 		this._memory = memory;
+
 		this._value = new TextDecoder().decode(memory);
 	}
 }
 
 interface Word {
 	name: string;
+
 	line: number;
+
 	index: number;
 }
 
@@ -114,6 +133,7 @@ export function timeout(ms: number) {
 export class MockRuntime extends EventEmitter {
 	// the initial (and one and only) file we are 'debugging'
 	private _sourceFile: string = "";
+
 	public get sourceFile() {
 		return this._sourceFile;
 	}
@@ -122,19 +142,26 @@ export class MockRuntime extends EventEmitter {
 
 	// the contents (= lines) of the one and only file
 	private sourceLines: string[] = [];
+
 	private instructions: Word[] = [];
+
 	private starts: number[] = [];
+
 	private ends: number[] = [];
 
 	// This is the next line that will be 'executed'
 	private _currentLine = 0;
+
 	private get currentLine() {
 		return this._currentLine;
 	}
+
 	private set currentLine(x) {
 		this._currentLine = x;
+
 		this.instruction = this.starts[x];
 	}
+
 	private currentColumn: number | undefined;
 
 	// This is the next instruction that will be 'executed'
@@ -153,6 +180,7 @@ export class MockRuntime extends EventEmitter {
 	private breakAddresses = new Map<string, string>();
 
 	private namedException: string | undefined;
+
 	private otherExceptions = false;
 
 	constructor(private fileAccessor: FileAccessor) {
@@ -191,6 +219,7 @@ export class MockRuntime extends EventEmitter {
 			if (this.updateCurrentLine(reverse)) {
 				break;
 			}
+
 			if (this.findNextStatement(reverse)) {
 				break;
 			}
@@ -207,6 +236,7 @@ export class MockRuntime extends EventEmitter {
 			} else {
 				this.instruction++;
 			}
+
 			this.sendEvent("stopOnStep");
 		} else {
 			if (!this.executeLine(this.currentLine, reverse)) {
@@ -224,7 +254,9 @@ export class MockRuntime extends EventEmitter {
 			} else {
 				// no more lines: stop at first line
 				this.currentLine = 0;
+
 				this.currentColumn = undefined;
+
 				this.sendEvent("stopOnEntry");
 
 				return true;
@@ -235,11 +267,13 @@ export class MockRuntime extends EventEmitter {
 			} else {
 				// no more lines: run to end
 				this.currentColumn = undefined;
+
 				this.sendEvent("end");
 
 				return true;
 			}
 		}
+
 		return false;
 	}
 
@@ -249,6 +283,7 @@ export class MockRuntime extends EventEmitter {
 	public stepIn(targetId: number | undefined) {
 		if (typeof targetId === "number") {
 			this.currentColumn = targetId;
+
 			this.sendEvent("stopOnStep");
 		} else {
 			if (typeof this.currentColumn === "number") {
@@ -261,6 +296,7 @@ export class MockRuntime extends EventEmitter {
 			} else {
 				this.currentColumn = 1;
 			}
+
 			this.sendEvent("stopOnStep");
 		}
 	}
@@ -276,6 +312,7 @@ export class MockRuntime extends EventEmitter {
 				this.currentColumn = undefined;
 			}
 		}
+
 		this.sendEvent("stopOnStep");
 	}
 
@@ -307,6 +344,7 @@ export class MockRuntime extends EventEmitter {
 		const line = this.getLine();
 
 		const words = this.getWords(this.currentLine, line);
+
 		words.push({ name: "BOTTOM", line: -1, index: -1 }); // add a sentinel so that the stack is never empty...
 
 		// if the line contains the word 'disassembly' we support to "disassemble" the line by adding an 'instruction' property to the stackframe
@@ -368,8 +406,10 @@ export class MockRuntime extends EventEmitter {
 
 		if (!bps) {
 			bps = new Array<IRuntimeBreakpoint>();
+
 			this.breakPoints.set(path, bps);
 		}
+
 		bps.push(bp);
 
 		await this.verifyBreakpoints(path);
@@ -391,11 +431,13 @@ export class MockRuntime extends EventEmitter {
 
 			if (index >= 0) {
 				const bp = bps[index];
+
 				bps.splice(index, 1);
 
 				return bp;
 			}
 		}
+
 		return undefined;
 	}
 
@@ -418,6 +460,7 @@ export class MockRuntime extends EventEmitter {
 		} else {
 			this.breakAddresses.set(address, x);
 		}
+
 		return true;
 	}
 
@@ -430,6 +473,7 @@ export class MockRuntime extends EventEmitter {
 		otherExceptions: boolean,
 	): void {
 		this.namedException = namedException;
+
 		this.otherExceptions = otherExceptions;
 	}
 
@@ -454,6 +498,7 @@ export class MockRuntime extends EventEmitter {
 			if (cancellationToken && cancellationToken()) {
 				break;
 			}
+
 			await timeout(1000);
 		}
 
@@ -514,12 +559,14 @@ export class MockRuntime extends EventEmitter {
 		while ((match = WORD_REGEXP.exec(line))) {
 			words.push({ name: match[0], line: l, index: match.index });
 		}
+
 		return words;
 	}
 
 	private async loadSource(file: string): Promise<void> {
 		if (this._sourceFile !== file) {
 			this._sourceFile = this.normalizePathAndCasing(file);
+
 			this.initializeContents(await this.fileAccessor.readFile(file));
 		}
 	}
@@ -530,7 +577,9 @@ export class MockRuntime extends EventEmitter {
 		this.instructions = [];
 
 		this.starts = [];
+
 		this.instructions = [];
+
 		this.ends = [];
 
 		for (let l = 0; l < this.sourceLines.length; l++) {
@@ -541,6 +590,7 @@ export class MockRuntime extends EventEmitter {
 			for (let word of words) {
 				this.instructions.push(word);
 			}
+
 			this.ends.push(this.instructions.length);
 		}
 	}
@@ -551,7 +601,9 @@ export class MockRuntime extends EventEmitter {
 	private findNextStatement(reverse: boolean, stepEvent?: string): boolean {
 		for (
 			let ln = this.currentLine;
+
 			reverse ? ln >= 0 : ln < this.sourceLines.length;
+
 			reverse ? ln-- : ln++
 		) {
 			// is there a source breakpoint?
@@ -568,6 +620,7 @@ export class MockRuntime extends EventEmitter {
 					// if breakpoint is not yet verified, verify it now and send a 'breakpoint' update event
 					if (!bps[0].verified) {
 						bps[0].verified = true;
+
 						this.sendEvent("breakpointValidated", bps[0]);
 					}
 
@@ -585,11 +638,13 @@ export class MockRuntime extends EventEmitter {
 				break;
 			}
 		}
+
 		if (stepEvent) {
 			this.sendEvent(stepEvent);
 
 			return true;
 		}
+
 		return false;
 	}
 
@@ -653,6 +708,7 @@ export class MockRuntime extends EventEmitter {
 						// the first write access to a variable is the "declaration" and not a "write access"
 						access = "write";
 					}
+
 					this.variables.set(name, v);
 				} else {
 					if (this.variables.has(name)) {
@@ -726,6 +782,7 @@ export class MockRuntime extends EventEmitter {
 
 		if (bps) {
 			await this.loadSource(path);
+
 			bps.forEach((bp) => {
 				if (!bp.verified && bp.line < this.sourceLines.length) {
 					const srcLine = this.getLine(bp.line);
@@ -742,6 +799,7 @@ export class MockRuntime extends EventEmitter {
 					// in this case the breakpoint will be verified 'lazy' after hitting it once.
 					if (srcLine.indexOf("lazy") < 0) {
 						bp.verified = true;
+
 						this.sendEvent("breakpointValidated", bp);
 					}
 				}
