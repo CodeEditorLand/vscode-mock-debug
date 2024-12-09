@@ -172,6 +172,7 @@
 			]
 		}
 	},
+	"dependencies": {},
 	"description": "Starter extension for developing debug adapters for VS Code.",
 	"devDependencies": {
 		"@types/glob": "8.1.0",
