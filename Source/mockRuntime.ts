@@ -601,9 +601,7 @@ export class MockRuntime extends EventEmitter {
 	private findNextStatement(reverse: boolean, stepEvent?: string): boolean {
 		for (
 			let ln = this.currentLine;
-
 			reverse ? ln >= 0 : ln < this.sourceLines.length;
-
 			reverse ? ln-- : ln++
 		) {
 			// is there a source breakpoint?

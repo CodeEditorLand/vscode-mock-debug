@@ -190,9 +190,7 @@ export function activateMockDebug(
 
 				for (
 					let l = viewport.start.line;
-
 					l <= context.stoppedLocation.end.line;
-
 					l++
 				) {
 					const line = document.lineAt(l);
